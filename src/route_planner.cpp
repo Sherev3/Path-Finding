@@ -35,7 +35,18 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 // - For each node in current_node.neighbors, add the neighbor to open_list and set the node's visited attribute to true.
 
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
-
+    current_node->FindNeighbors();
+    for(RouteModel::Node* neighbor_node:current_node->neighbors)
+    {
+        neighbor_node->parent = current_node;
+        neighbor_node->h_value = CalculateHValue(neighbor_node);
+        neighbor_node->g_value = neighbor_node->distance(*current_node);  
+        if(neighbor_node->visited  == false)
+        {
+            neighbor_node->visited = true;
+            this->open_list.push_back(neighbor_node);
+        }    
+    }
 }
 
 
@@ -47,7 +58,58 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Return the pointer.
 
 RouteModel::Node *RoutePlanner::NextNode() {
+    /*
+    int a = 4;
+    int b = 3;
+    int c = 2;
+    int d = 1;
+    int *pa = &a;
+    int *pb = &b;
+    int *pc = &c;
+    int *pd = &d;
+    std::vector<int *> f_values;
+    f_values.push_back(pa);
+    f_values.push_back(pb);
+    f_values.push_back(pc);
+    f_values.push_back(pd);
+    int n = sizeof(f_values)/sizeof(f_values[0]);
+    std::sort(f_values[0],f_values[3]);
+    for(int *i:f_values)
+    {
+        std::cout << "value: " << *i << "\n";
+    }*/
+    
+    
+    //std::cout << "begin value: " <<f_values.begin()<<"\n";
+    //std::cout << " address value of pa: "<< f_values[0] << "\n";
+    //std::cout << " address of the first element in vector: "<< &f_values[0] << "\n";
+    //std::cout << "front test: " << (*f_values.front()) << "\n";
+    RouteModel::Node *lowest_sum;
+    std::vector<float> f_values;
+    std::vector<RouteModel::Node *> ordered_open_list;
+    for(RouteModel::Node *i: this->open_list)
+    {
+        float tmp_f_value;
+        tmp_f_value = i->g_value + i->h_value;
+        f_values.push_back(tmp_f_value) ;
+    }
+    std::sort(f_values.begin(),f_values.end());
 
+    for(float i : f_values)
+    {
+        for(RouteModel::Node *x : this->open_list)
+        {
+            if(x->g_value + x->h_value == i && std::find(ordered_open_list.begin(),ordered_open_list.end(),x) != ordered_open_list.end())
+            {
+                ordered_open_list.push_back(x);                
+            }
+        }
+    }
+    this->open_list= ordered_open_list;
+    lowest_sum = open_list.front();
+    this->open_list.erase(open_list.begin());
+
+    return lowest_sum;
 }
 
 
@@ -63,9 +125,18 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     // Create path_found vector
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
-
+    //RouteModel::Node *dummy_address;
     // TODO: Implement your solution here.
+    while(current_node != this->start_node)
+    {
+        distance += current_node->distance(*(current_node->parent)); 
+        path_found.push_back(*current_node);
+        current_node = current_node->parent;
 
+    }
+    path_found.push_back(*current_node);
+    std::reverse(path_found.begin(),path_found.end());
+    //dummy_address = this->NextNode();
     distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
     return path_found;
 
