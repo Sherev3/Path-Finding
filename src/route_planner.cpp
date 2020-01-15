@@ -13,7 +13,7 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
     start_node = &m_Model.FindClosestNode(start_x,start_y);
     end_node = &m_Model.FindClosestNode(end_x,end_y);
 }
-
+//std::vector<RouteModel::Node*> lowest_sum_vector; 
 
 // TODO 3: Implement the CalculateHValue method.
 // Tips:
@@ -41,12 +41,15 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
         neighbor_node->parent = current_node;
         neighbor_node->h_value = this->CalculateHValue(neighbor_node);
         neighbor_node->g_value = neighbor_node->distance(*current_node);  
-        if(neighbor_node->visited  == false)
+        if(neighbor_node->visited  == false )
         {
-            neighbor_node->visited = true;
             this->open_list.push_back(neighbor_node);
+            neighbor_node->visited = true;
+            
         }    
     }
+
+    current_node->visited =true;
 }
 
 
@@ -85,8 +88,8 @@ RouteModel::Node *RoutePlanner::NextNode() {
     {
         std::cout << x->g_value + x->h_value <<"\n";
     }
-     std::cout << "stop" <<"\n";
     lowest_sum_node = open_list[0];
+    std::cout<<open_list.size()<<"\n";
     this->open_list.erase(open_list.begin());
     return lowest_sum_node;
 }
@@ -131,20 +134,23 @@ void RoutePlanner::AStarSearch() {
     // TODO: Implement your solution here.
     RouteModel::Node *lowest_sum_node;
     std::vector<RouteModel::Node> path;
-    
+
+    //this->open_list.push_back(this->start_node);
     while(current_node != this->end_node)
     {   
         this->AddNeighbors(current_node);
-        lowest_sum_node = this->NextNode();  
+        lowest_sum_node = this->NextNode();
         current_node = lowest_sum_node;
     }
-    this->AddNeighbors(end_node);
-    path = this->ConstructFinalPath(end_node);
-    //std::cout << path.size()<<"\n";
+    //this->AddNeighbors(end_node);
+    path = this->ConstructFinalPath(current_node);
+
+    std::cout << "start"<<"\n";
     /*
     for(RouteModel::Node x : path)
     {
         std::cout << x.g_value + x.h_value <<"\n";
     }*/
+
     m_Model.path = path;
 }
