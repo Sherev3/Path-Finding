@@ -40,7 +40,7 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
     {
         neighbor_node->parent = current_node;
         neighbor_node->h_value = this->CalculateHValue(neighbor_node);
-        neighbor_node->g_value = neighbor_node->distance(*current_node);  
+        neighbor_node->g_value = current_node->g_value + neighbor_node->distance(*current_node);  
         if(neighbor_node->visited  == false )
         {
             this->open_list.push_back(neighbor_node);
@@ -84,12 +84,7 @@ RouteModel::Node *RoutePlanner::NextNode() {
         }
     }
     
-    for(RouteModel::Node * x: open_list)
-    {
-        std::cout << x->g_value + x->h_value <<"\n";
-    }
     lowest_sum_node = open_list[0];
-    std::cout<<open_list.size()<<"\n";
     this->open_list.erase(open_list.begin());
     return lowest_sum_node;
 }
@@ -131,26 +126,18 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
 
 void RoutePlanner::AStarSearch() {
     RouteModel::Node *current_node = this->start_node;
+
     // TODO: Implement your solution here.
     RouteModel::Node *lowest_sum_node;
     std::vector<RouteModel::Node> path;
 
-    //this->open_list.push_back(this->start_node);
     while(current_node != this->end_node)
     {   
         this->AddNeighbors(current_node);
         lowest_sum_node = this->NextNode();
         current_node = lowest_sum_node;
     }
-    //this->AddNeighbors(end_node);
+
     path = this->ConstructFinalPath(current_node);
-
-    std::cout << "start"<<"\n";
-    /*
-    for(RouteModel::Node x : path)
-    {
-        std::cout << x.g_value + x.h_value <<"\n";
-    }*/
-
     m_Model.path = path;
 }
