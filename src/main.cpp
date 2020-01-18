@@ -61,15 +61,29 @@ int main(int argc, const char **argv)
     float start_y;
     float end_x;
     float end_y;
+    bool variables_not_in_range = true;
+    int max_value = 100;
+    int min_value = 0; 
     
-    cout << "Enter your starting x-coordinate: "<<"\n";
-    cin >> start_x; 
-    cout << "Enter your starting y-coordinate: "<<"\n";
-    cin >> start_y; 
-    cout << "Enter your ending x-coordinate: "<<"\n";
-    cin >> end_x; 
-    cout << "Enter your ending y-coordinate: "<<"\n";
-    cin >> end_y;
+    while(variables_not_in_range)
+    {
+        cout << "Enter your starting x-coordinate: \n";
+        cin >> start_x; 
+        cout << "Enter your starting y-coordinate: \n";
+        cin >> start_y; 
+        cout << "Enter your ending x-coordinate: \n";
+        cin >> end_x; 
+        cout << "Enter your ending y-coordinate: \n";
+        cin >> end_y;
+        if(start_x >= 0 && start_x <= 100 && start_y >= 0 && start_y <= 100 && end_x >= 0 && end_x <= 100 && end_y >= 0 && end_y <= 100)
+        {
+            variables_not_in_range = false;
+        }
+        else
+        {
+            cout << "variables of range \n";
+        }
+    }
      
     // Build Model.
     RouteModel model{osm_data};
